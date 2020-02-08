@@ -7,8 +7,10 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         medicalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendNotification();
+                showNotification(MainActivity.this,"Medical Emergency","This is a test notification");
             }
         });
 
@@ -243,21 +245,37 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-    void sendNotification(){
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.common_full_open_on_phone)
-                        .setContentTitle("Medical Emergency")
-                        .setContentText("This is a test notification");
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
 
-        // Add as notification
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
+    public void showNotification(Context context, String title, String body) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        int notificationId = 1;
+        String channelId = "channel-01";
+        String channelName = "Channel Name";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        Intent intent = new Intent(context, MainActivity.class);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel mChannel = new NotificationChannel(
+                    channelId, channelName, importance);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(body);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntent(intent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        notificationManager.notify(notificationId, mBuilder.build());
     }
 
     void sendDataToFirebase(String uid,String token)

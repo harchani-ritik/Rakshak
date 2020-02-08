@@ -24,7 +24,7 @@ const message = (registrationToken, location, type, msg) => {
     data: {
       loc : location,
       type: type,
-      msg: msg,
+      msg: msg
     },
     token: registrationToken
   };
