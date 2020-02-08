@@ -2,6 +2,7 @@ var express = require("express");
 var admin = require('firebase-admin');
 var app = express();
 let report = require("./Report");
+let predictServer = "192.168.13.212:3005/"
 var bodyParser = require("body-parser");
 global.__root = __dirname + "/";
 var app = express()
@@ -154,6 +155,18 @@ app.post("/requests", function(req, res){
     });
     
 });
+
+
+app.post("/predict", function(req, res){
+  let url = predictServer + 
+          "predict?military_time=" + req.body.military_time + 
+          "&lat=" + req.body.lat +
+          "&long=" + req.body.long +
+          "&age=" + req.body.age + 
+          "&gender=" + req.body.gender;  
+  res.send(url);
+});
+
 
 app.post("/form-page", function(req, res){
   res.send("Hi");

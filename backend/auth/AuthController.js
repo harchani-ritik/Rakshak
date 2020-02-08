@@ -39,7 +39,17 @@ router.post("/login", function(req, res) {
   });
 });
 
-router.get("/:networkId/requests", VerifyToken, function(req, res){
+router.post("/setUrl",  function(req, res, next){
+  console.log("andar" + " " + req.body.uid);
+  const url = req.body.url;
+  User.findByIdAndUpdate( req.body.uid , {"networkId":req.body.url}, (err, user)=>{
+    console.log("mila" + " " + user.uid);
+    console.log(user);
+  });
+ 
+});
+
+router.post("/:networkId/requests", VerifyToken, function(req, res, next){
   report.find({networkId : req.params.networkId}, function(err, reports){
     console.log(req.params.networkId);
     let response  = [];
@@ -54,6 +64,7 @@ router.get("/:networkId/requests", VerifyToken, function(req, res){
           response.push(temp);
           console.log(temp);
     });
+    response.reverse();
     res.send(response);
   });
 });
