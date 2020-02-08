@@ -16,6 +16,7 @@ admin.initializeApp({
   databaseURL: "https://rakshak-53755.firebaseio.com"
 });
 
+var dbm = require("./db");
 var db = admin.database();
 var ref = db.ref("users");
 
@@ -39,6 +40,12 @@ const message = (registrationToken, location, type, msg) => {
       console.log('Error sending message:' + registrationToken, error);
     });
 };
+
+var UserController = require(__root + "user/UserController");
+app.use("/users", UserController);
+
+var AuthController = require(__root + "auth/AuthController");
+app.use("/auth", AuthController);
 
 const isViable = (uid) => {
   return true;

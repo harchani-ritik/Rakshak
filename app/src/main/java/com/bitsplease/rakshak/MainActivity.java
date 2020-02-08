@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     Button medicalButton;
 
     @SuppressLint("MissingPermission")
-    void makeCall()
+    void makeCall(String type)
     {
         fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
             @Override
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = new FormBody.Builder()
                 .add("uid", mUid)
                 .add("loc", lat + " " + lon)
-                .add("type", "fire")
+                .add("type", type)
                 .add("msg","")
                 .build();
 
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    makeCall();
+                    makeCall("fire");
                 }
             }
         });
