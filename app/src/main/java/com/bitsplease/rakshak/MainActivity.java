@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -39,9 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     String mUsername;
+    String mUid,mToken;
 
     private static int REQUEST_PHONE_CALL=1;
     Button helpButton;
+    Button medical;
 
     @SuppressLint("MissingPermission")
     void makeCall()
@@ -83,9 +87,10 @@ public class MainActivity extends AppCompatActivity {
                                         Log.w(TAG, "getInstanceId failed", task.getException());
                                         return;
                                     }
-
                                     // Get new Instance ID token
                                     String token = task.getResult().getToken();
+                                    mToken = token;
+                                    sendDataToFirebase(mUid,token);
                                     Log.d(TAG, "onComplete: "+token);
                                     Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
 //                                    // Log and toast
@@ -99,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         //Firebase
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -108,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
                 if (user != null) {
                     // user is signed in
                     mUsername = user.getDisplayName();
+                    mUid = user.getUid();
+                    //sendDataToFirebase(mUid,mToken);
                 } else {
                     // user is signed out
                     Log.d(TAG, "onAuthStateChanged: User is signed out.");
@@ -126,6 +134,12 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    void sendDataToFirebase(String uid,String token)
+    {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mUsersDatabaseReference = firebaseDatabase.getReference().child("users");
+        mUsersDatabaseReference.child(uid).setValue(token);
+    }
     @Override
     protected void onPause() {
         super.onPause();
