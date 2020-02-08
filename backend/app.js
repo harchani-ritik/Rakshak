@@ -19,13 +19,12 @@ admin.initializeApp({
 var db = admin.database();
 var ref = db.ref("users");
 
-const message = (registrationToken, location, date, type, time) => {
+const message = (registrationToken, location, type, msg) => {
   var message = {
     data: {
       loc : location,
-      date: date,
       type: type,
-      time: time
+      msg: msg,
     },
     token: registrationToken
   };
@@ -34,10 +33,10 @@ const message = (registrationToken, location, date, type, time) => {
   admin.messaging().send(message)
     .then((response) => {
       // Response is a message ID string.
-      console.log('Successfully sent message:', response);
+      console.log('Successfully sent message:' + registrationToken, response);
     })
     .catch((error) => {
-      console.log('Error sending message:', error);
+      console.log('Error sending message:' + registrationToken, error);
     });
 };
 
@@ -69,9 +68,10 @@ app.post("/requests", function(req, res){
     let tokens = snapshot.val();
     Object.keys(tokens).forEach(function(key) {
       //Decide whether the current key is viable for sending the message
-      if (key!==uid && isViable(key)){
-        message(tokens[key], req.body.loc, req.body.date, req.body.type, req.body.time);
-      } 
+       if (key!==uid && isViable(key) && tokens[key]!=='ABCD'){
+        //console.log(tokens[key]);
+        message(tokens[key], req.body.loc, req.body.type, req.body.msg);
+       } 
     });
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
@@ -80,4 +80,9 @@ app.post("/requests", function(req, res){
   //the response
   res.status(200).send(req.body);
 });
+
+app.post("/form-page", function(req, res){
+  res.send("Hi");
+});
+
 module.exports = app;

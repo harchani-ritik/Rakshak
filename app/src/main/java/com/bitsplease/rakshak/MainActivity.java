@@ -11,13 +11,18 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 //import android.telecom.Call;
 import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
 //import com.google.android.gms.common.api.Response;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,13 +58,19 @@ public class MainActivity extends AppCompatActivity {
 
     String TAG = "MyLOGS";
     private static final int RC_SIGN_IN = 1;
-
+    private static final String[] REQUIRED_PERMISSIONS =
+            new String[] {
+                    Manifest.permission.CALL_PHONE,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            };
+    private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
     //Firebase
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FusedLocationProviderClient fusedLocationClient;
     String mUsername;
     String mUid,mToken;
-
+    String lat, lon;
     private static int REQUEST_PHONE_CALL=1;
     Button helpButton;
     Button medicalButton;
@@ -67,13 +78,26 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     void makeCall()
     {
+        fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                Log.d(TAG, "onSuccess: got location");
+
+                if (location != null) {
+                    // Logic to handle location
+                    lat = location.getLatitude() + "";
+                    lon = location.getLongitude() + "";
+                    Log.d(TAG, "onSuccess: Location found");
+                    Log.d(TAG, "onSuccess: Lat is "+lat+"Long is "+lon);
+                }
+            }
+        });
         String url = getResources().getString(R.string.server) + "requests";
         RequestBody body = new FormBody.Builder()
-                .add("uid", "yup")
-                .add("loc", "vl")
-                .add("date", "v2")
-                .add("time", "true")
+                .add("uid", mUid)
+                .add("loc", lat + " " + lon)
                 .add("type", "fire")
+                .add("msg","")
                 .build();
 
         OkHttpClient client = new OkHttpClient();
@@ -83,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 .post(body)
                 .build();
         Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
-        //Call call = client.newCall(request);
 
         client.newCall(request).enqueue(new Callback(){
 
@@ -114,28 +137,37 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == REQUEST_PHONE_CALL) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                makeCall();
-            } else {
-                Toast.makeText(MainActivity.this, "Calling Permission Denied", Toast.LENGTH_SHORT).show();
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
+            for (int grantResult : grantResults) {
+                if (grantResult == PackageManager.PERMISSION_DENIED) {
+                    Toast.makeText(this, R.string.error_missing_permissions, Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
             }
+            recreate();
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         helpButton = findViewById(R.id.help_button);
         ((View) helpButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(MainActivity.this,"Grant Permission to make calls",Toast.LENGTH_SHORT).show();
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+                if (!hasPermissions(getApplicationContext(), getRequiredPermissions())) {
+                    if (!hasPermissions(getApplicationContext(), getRequiredPermissions())) {
+
+                            Log.d("Hello", "There");
+                            requestPermissions(  getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
+
+                    }
                 }
                 else {
                     makeCall();
@@ -149,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
                 sendNotification();
             }
         });
-
 
         //Firebase
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -200,6 +231,18 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    protected String[] getRequiredPermissions() {
+        return REQUIRED_PERMISSIONS;
+    }
+    public static boolean hasPermissions(Context context, String... permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(context, permission)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
     void sendNotification(){
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
