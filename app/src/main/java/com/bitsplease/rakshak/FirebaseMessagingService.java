@@ -7,6 +7,7 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.Objects;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
@@ -54,18 +57,61 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             title="Disaster Alert";
             message=getString(R.string.disaster_message);
         }
-        showNotification(FirebaseMessagingService.this,title,message);
-        super.onMessageReceived(remoteMessage);
+        try {
+            String[] location = Objects.requireNonNull(remoteMessage.getData().get("loc")).split(" ", 2);
+            double distance = getDistanceFromEmergency(location[0], location[1]);
+            message = message + "\nEmergency received at distance = " + distance + " KM";
+            String dis = String.valueOf(distance).substring(0, 10);
+            showNotification(FirebaseMessagingService.this, title + " (" + dis + "KM)", message,location[0],location[1]);
+            Log.d(TAG, "Message=" + message);
+            super.onMessageReceived(remoteMessage);
+        }
+        catch (Exception e)
+        {
+            Log.d(TAG, "Exception encountered" + e);
+        }
     }
 
-    public void showNotification(Context context, String title, String body) {
+    double getDistanceFromEmergency(String lat1,String lon1)
+    {
+        String lat2= MainActivity.mLat;
+        String lon2 = MainActivity.mLon;
+        return distance(Double.parseDouble(lat1),Double.parseDouble(lon1),Double.parseDouble(lat2),Double.parseDouble(lon2));
+    }
+
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+    public void showNotification(Context context, String title, String body,String lat,String lon) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         int notificationId = 1;
         String channelId = "channel-01";
         String channelName = "Channel Name";
         int importance = NotificationManager.IMPORTANCE_HIGH;
-        Intent intent = new Intent(context, MainActivity.class);
+
+        Uri gmmIntentUri = Uri.parse("geo:"+lat+","+lon+"?z=20");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(
@@ -79,7 +125,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 .setContentText(body);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addNextIntent(intent);
+        stackBuilder.addNextIntent(mapIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
                 0,
                 PendingIntent.FLAG_UPDATE_CURRENT
