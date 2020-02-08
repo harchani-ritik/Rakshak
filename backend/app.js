@@ -19,6 +19,7 @@ admin.initializeApp({
 var dbm = require("./db");
 var db = admin.database();
 var ref = db.ref("users");
+var refn = db.ref("network");
 
 const message = (registrationToken, location, type, msg) => {
   var message = {
@@ -57,6 +58,11 @@ const isValid = (body) => {
 
 app.get("/", function(req, res) {
   ref.on("value", function(snapshot) {
+    console.log(snapshot.val());
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+  refn.on("value", function(snapshot) {
     console.log(snapshot.val());
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);

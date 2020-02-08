@@ -67,12 +67,12 @@ router.post("/register", function(req, res) {
   );
 });
 
-router.get("/me", VerifyToken, function(req, res, next) {
+router.post("/me", VerifyToken, function(req, res, next) {
   User.findById(req.userId, { password: 0 }, function(err, user) {
     if (err)
-      return res.status(500).send({"auth": false});em 
+      return res.status(500).send({"auth": false});
     if (!user) return res.status(404).send({"auth": false});
-    res.status(200).send({"auth": true});
+    res.status(200).send({"auth": true, "user" : user});
   });
 });
 
