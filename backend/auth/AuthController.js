@@ -1,7 +1,8 @@
 var express = require("express");
+var admin = require('firebase-admin');
 var router = express.Router();
 var bodyParser = require("body-parser");
-
+const report = require("../Report");
 var VerifyToken = require("./VerifyToken");
 
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -35,6 +36,25 @@ router.post("/login", function(req, res) {
 
     // return the information including token as JSON
     res.status(200).send({ auth: true, token: token });
+  });
+});
+
+router.get("/:networkId/requests", VerifyToken, function(req, res){
+  report.find({networkId : req.params.networkId}, function(err, reports){
+    console.log(req.params.networkId);
+    let response  = [];
+    reports.forEach(element => {
+          let temp = {
+            uid: element.uid,
+            msg: element.msg,
+            type: element.type,
+            date: element.date,
+            name: element.name
+          };
+          response.push(temp);
+          console.log(temp);
+    });
+    res.send(response);
   });
 });
 

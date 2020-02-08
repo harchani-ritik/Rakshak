@@ -1,7 +1,7 @@
 var express = require("express");
 var admin = require('firebase-admin');
 var app = express();
-
+let report = require("./Report");
 var bodyParser = require("body-parser");
 global.__root = __dirname + "/";
 var app = express()
@@ -57,6 +57,7 @@ const isValid = (body) => {
 };
 
 app.get("/", function(req, res) {
+
   ref.on("value", function(snapshot) {
     console.log(snapshot.val());
   }, function (errorObject) {
@@ -69,6 +70,40 @@ app.get("/", function(req, res) {
   });
   res.status(200).send("Something went wrong");
 });
+
+
+app.post("/raiseAlert", function (req, res){
+  console.log(req.body);
+  let userstoSend = [];
+  refn.on("value", function(snapshot) {
+    let ids = snapshot.val();
+    Object.keys(ids).forEach(function(key) {
+      //Decide whether the current key is viable for sending the message
+       if (ids[key]==req.body.uid && isViable(key)){
+        console.log(ids[key]);
+        userstoSend.push(key);
+       } 
+    });
+    console.log(userstoSend);
+    ref.on("value", function(snapshot) {
+      let tokens = snapshot.val();
+      Object.keys(tokens).forEach(function(key) {
+        //Decide whether the current key is viable for sending the message
+         if (userstoSend.includes(key) && isViable(key) && tokens[key]!=='ABCD'){
+          //console.log(tokens[key]);
+          message(tokens[key], "18 71", "general", req.body.info);
+         } 
+      });
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });
+    res.redirect("home?alert=true");
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+});
+
+
 
 app.post("/requests", function(req, res){
   //checking for a valid request
@@ -84,14 +119,40 @@ app.post("/requests", function(req, res){
        if (key!==uid && isViable(key) && tokens[key]!=='ABCD'){
         //console.log(tokens[key]);
         message(tokens[key], req.body.loc, req.body.type, req.body.msg);
-       } 
+       }
     });
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
-
-  //the response
-  res.status(200).send(req.body);
+  refn.on("value", function(snapshot) {
+    admin.auth().getUser(req.body.uid).then((userRecord)=>{
+      report.create(
+        {
+          type : req.body.type,
+          msg : req.body.msg,
+          uid : req.body.uid,
+          networkId : snapshot.val()[uid],
+          name: userRecord.displayName
+        },
+        function(err, report){
+          if (err) {
+            console.log();
+            return res
+            .status(500)
+            .send("There was a problem adding the information to the database.");
+          }
+          else {
+            console.log(report);
+            res.status(200).send(report);
+          }
+        }
+      );
+      console.log(snapshot.val()[uid]);
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });
+    });
+    
 });
 
 app.post("/form-page", function(req, res){
