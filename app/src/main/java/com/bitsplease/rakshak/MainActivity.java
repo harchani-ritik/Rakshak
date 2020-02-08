@@ -1,6 +1,7 @@
 package com.bitsplease.rakshak;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -14,6 +15,9 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 //import android.telecom.Call;
 import android.util.Log;
@@ -55,10 +59,12 @@ public class MainActivity extends AppCompatActivity {
     String TAG = "MyLOGS";
     String emergencyType = "general";
     private static final int RC_SIGN_IN = 1;
+
     private static final String[] REQUIRED_PERMISSIONS = new String[] {
             Manifest.permission.CALL_PHONE, Manifest.permission.ACCESS_COARSE_LOCATION
     };
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
+
     private FusedLocationProviderClient fusedLocationClient;
     //Firebase
     private FirebaseAuth mFirebaseAuth;
@@ -141,24 +147,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
         startActivity(intent);
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
-            for (int grantResult : grantResults) {
-                if (grantResult == PackageManager.PERMISSION_DENIED) {
-                    Toast.makeText(this, R.string.error_missing_permissions, Toast.LENGTH_LONG).show();
-                    finish();
-                    return;
-                }
-                else
-                {
-                    makeCall(emergencyType);
-                }
-            }
-            recreate();
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,15 +154,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
-        }
-
-        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 101);
-        }
-
         helpButton = findViewById(R.id.BTNhelp);
+
+        //now checking network connectivity.
+        if(isNetworkAvailable()){
+            Log.d(TAG, "onActivityResult: NETOWRK AVAILABLE");
+            Intent intent= new Intent(MainActivity.this,com.bitsplease.rakshak.InNetwork.class);
+            startActivity(intent);
+        }
+
         ((View) helpButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -229,8 +217,6 @@ public class MainActivity extends AppCompatActivity {
                             // Logic to handle location object
                             String mlat = location.getLatitude() + "";
                             String mlong = location.getLongitude() + "";
-//                              BTNsend.setEnabled(true);
-//                                Toast.makeText(Emergency.this, "Selected is " + select, Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "onSuccess: Location found");
                             Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
                         }
@@ -283,12 +269,12 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    void sendDataToFirebase(String uid,String token)
-    {
+    void sendDataToFirebase(String uid,String token) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mUsersDatabaseReference = firebaseDatabase.getReference().child("users");
         mUsersDatabaseReference.child(uid).setValue(token);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -300,4 +286,58 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RC_SIGN_IN){
+            if(resultCode==RESULT_OK){
+                if (!hasPermissions(this, getRequiredPermissions())) {
+                    Log.d("Hello", "There");
+                    requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
+                }
+            }
+
+            else if(resultCode==RESULT_CANCELED){
+                Toast.makeText(this, "Cannot work, until you sign in.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
+            for (int grantResult : grantResults) {
+                if (grantResult == PackageManager.PERMISSION_DENIED) {
+                    Toast.makeText(this, R.string.error_missing_permissions, Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+            }
+            recreate();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+    protected String[] getRequiredPermissions() {
+        return REQUIRED_PERMISSIONS;
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(context, permission)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 }
