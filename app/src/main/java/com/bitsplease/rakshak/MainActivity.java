@@ -2,6 +2,7 @@ package com.bitsplease.rakshak;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getApplicationContext(), response.body().toString(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), response.body().toString(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -121,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-
                 e.printStackTrace();
             }
         });
@@ -152,6 +152,10 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                     return;
                 }
+                else
+                {
+                    makeCall(emergencyType);
+                }
             }
             recreate();
         }
@@ -167,12 +171,10 @@ public class MainActivity extends AppCompatActivity {
         ((View) helpButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!hasPermissions(getApplicationContext(), getRequiredPermissions())) {
-                    if (!hasPermissions(getApplicationContext(), getRequiredPermissions())) {
 
-                            Log.d("Hello", "There");
-                            requestPermissions(  getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-                    }
+                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(MainActivity.this,"Grant Permission to make calls",Toast.LENGTH_SHORT).show();
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
                 }
                 else {
                     makeCall(emergencyType);
