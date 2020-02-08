@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = new FormBody.Builder()
                 .add("uid", mUid)
                 .add("loc", lat + " " + lon)
-                .add("type", "fire")
+                .add("type", type)
                 .add("msg","")
                 .build();
 
@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
         startActivity(intent);
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,9 +181,56 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
+
         else if(!isNetworkAvailable()){
             
         }
+
+//        ((View) helpButton).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//
+//                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    Toast.makeText(MainActivity.this, "Grant Permission to make calls", Toast.LENGTH_SHORT).show();
+//                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PHONE_CALL);
+//                } else {
+//                    makeCall(emergencyType);
+//                }
+//            }
+//        });
+//        generalButton= findViewById(R.id.BTNgeneral);
+//        fireButton = findViewById(R.id.BTNfire);
+//        medicalButton= findViewById(R.id.BTNmedical);
+//        disasterButton=findViewById(R.id.BTNdisaster);
+//
+//        generalButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"General Emergency Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="general";
+//            }
+//        });
+//        fireButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"Fire Emergency Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="fire";
+//            }
+//        });
+//        medicalButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"Medical Emergency Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="medical";
+//            }
+//        });
+//        disasterButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"Disaster Alert Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="disaster";
+
 
 //        ((View) helpButton).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -291,6 +337,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
     }
+
 
     void sendDataToFirebase(String uid,String token) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
