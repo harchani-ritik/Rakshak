@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     String emergencyType = "general";
     private static final int RC_SIGN_IN = 1;
 
+    static String mLat,mLon;
+
     private static final String[] REQUIRED_PERMISSIONS = new String[] {
             Manifest.permission.CALL_PHONE, Manifest.permission.ACCESS_COARSE_LOCATION
     };
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     String mUsername;
-    String mUid,mToken;
+    public static String mUid,mToken;
     String lat, lon;
     private static int REQUEST_PHONE_CALL=1;
     Button helpButton;
@@ -153,6 +155,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                Log.d(TAG, "onSuccess: got location");
+                // Got last known location. In some rare situations this can be null.
+                if (location != null) {
+                    // Logic to handle location object
+                    String mlat = location.getLatitude() + "";
+                    String mlong = location.getLongitude() + "";
+//                              BTNsend.setEnabled(true);
+//                                Toast.makeText(Emergency.this, "Selected is " + select, Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onSuccess: Location found");
+                    Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
+                    mLat=mlat;mLon=mlong;
+                }
+            }
+        });
 
         helpButton = findViewById(R.id.BTNhelp);
 
@@ -222,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-                
             }
         });
 
@@ -267,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
     }
 
     void sendDataToFirebase(String uid,String token) {
