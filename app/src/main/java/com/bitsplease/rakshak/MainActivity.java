@@ -154,26 +154,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                Log.d(TAG, "onSuccess: got location");
-                // Got last known location. In some rare situations this can be null.
-                if (location != null) {
-                    // Logic to handle location object
-                    String mlat = location.getLatitude() + "";
-                    String mlong = location.getLongitude() + "";
-//                              BTNsend.setEnabled(true);
-//                                Toast.makeText(Emergency.this, "Selected is " + select, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onSuccess: Location found");
-                    Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
-                    mLat=mlat;mLon=mlong;
-                }
-            }
-        });
-
-        helpButton = findViewById(R.id.BTNhelp);
+//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+//            @Override
+//            public void onSuccess(Location location) {
+//                Log.d(TAG, "onSuccess: got location");
+//                // Got last known location. In some rare situations this can be null.
+//                if (location != null) {
+//                    // Logic to handle location object
+//                    String mlat = location.getLatitude() + "";
+//                    String mlong = location.getLongitude() + "";
+////                              BTNsend.setEnabled(true);
+////                                Toast.makeText(Emergency.this, "Selected is " + select, Toast.LENGTH_SHORT).show();
+//                    Log.d(TAG, "onSuccess: Location found");
+//                    Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
+//                    mLat=mlat;mLon=mlong;
+//                }
+//            }
+//        });
+//
+//        helpButton = findViewById(R.id.BTNhelp);
 
         //now checking network connectivity.
         if(isNetworkAvailable()){
@@ -182,67 +182,71 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        ((View) helpButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        else if(!isNetworkAvailable()){
+            
+        }
 
-                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(MainActivity.this,"Grant Permission to make calls",Toast.LENGTH_SHORT).show();
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
-                }
-                else {
-                    makeCall(emergencyType);
-                }
-            }
-        });
-        generalButton= findViewById(R.id.BTNgeneral);
-        fireButton = findViewById(R.id.BTNfire);
-        medicalButton= findViewById(R.id.BTNmedical);
-        disasterButton=findViewById(R.id.BTNdisaster);
-
-        generalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this,"General Emergency Enabled",Toast.LENGTH_SHORT).show();
-                emergencyType="general";
-            }
-        });
-        fireButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this,"Fire Emergency Enabled",Toast.LENGTH_SHORT).show();
-                emergencyType="fire";
-            }
-        });
-        medicalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this,"Medical Emergency Enabled",Toast.LENGTH_SHORT).show();
-                emergencyType="medical";
-            }
-        });
-        disasterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this,"Disaster Alert Enabled",Toast.LENGTH_SHORT).show();
-                emergencyType="disaster";
-
-                fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        Log.d(TAG, "onSuccess: got location");
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            // Logic to handle location object
-                            String mlat = location.getLatitude() + "";
-                            String mlong = location.getLongitude() + "";
-                            Log.d(TAG, "onSuccess: Location found");
-                            Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
-                        }
-                    }
-                });
-            }
-        });
+//        ((View) helpButton).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+//                    Toast.makeText(MainActivity.this,"Grant Permission to make calls",Toast.LENGTH_SHORT).show();
+//                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+//                }
+//                else {
+//                    makeCall(emergencyType);
+//                }
+//            }
+//        });
+//        generalButton= findViewById(R.id.BTNgeneral);
+//        fireButton = findViewById(R.id.BTNfire);
+//        medicalButton= findViewById(R.id.BTNmedical);
+//        disasterButton=findViewById(R.id.BTNdisaster);
+//
+//        generalButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"General Emergency Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="general";
+//            }
+//        });
+//        fireButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"Fire Emergency Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="fire";
+//            }
+//        });
+//        medicalButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"Medical Emergency Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="medical";
+//            }
+//        });
+//        disasterButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this,"Disaster Alert Enabled",Toast.LENGTH_SHORT).show();
+//                emergencyType="disaster";
+//
+//                fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+//                    @Override
+//                    public void onSuccess(Location location) {
+//                        Log.d(TAG, "onSuccess: got location");
+//                        // Got last known location. In some rare situations this can be null.
+//                        if (location != null) {
+//                            // Logic to handle location object
+//                            String mlat = location.getLatitude() + "";
+//                            String mlong = location.getLongitude() + "";
+//                            Log.d(TAG, "onSuccess: Location found");
+//                            Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
+//                        }
+//                    }
+//                });
+//            }
+//        });
 
         //Firebase
         mFirebaseAuth = FirebaseAuth.getInstance();

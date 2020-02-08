@@ -17,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".InNetwork"></activity>
+        <activity android:name=".NoNetwork"></activity>
+        <activity android:name=".InNetwork" />
 
         <service
             android:name=".FirebaseMessagingService"
