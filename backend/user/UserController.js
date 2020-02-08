@@ -9,12 +9,11 @@ router.use(bodyParser.json());
 var User = require("./User");
 
 // CREATES A NEW USER
-router.post("/", function(req, res) {
+router.post("/create", function(req, res) {
   console.log(req.body);
   User.create(
     {
-      firstName: req.body.firstName,
-      phone: req.body.phone,
+      uid: req.body.uid,
       password: req.body.password
     },
     function(err, user) {

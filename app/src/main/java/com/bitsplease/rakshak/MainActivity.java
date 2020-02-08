@@ -164,16 +164,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!hasPermissions(getApplicationContext(), getRequiredPermissions())) {
-                    if (!hasPermissions(getApplicationContext(), getRequiredPermissions())) {
-
-                            Log.d("Hello", "There");
-                            requestPermissions(  getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-
-                    }
+                    checkPermission();
                 }
-                else {
-                    makeCall("fire");
-                }
+                else makeCall("fire");
             }
         });
         medicalButton= findViewById(R.id.BTNmedical);
@@ -233,6 +226,16 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+
+    public void checkPermission(){
+        if (Build.VERSION.SDK_INT < 23) {
+            ActivityCompat.requestPermissions(
+                    this, getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
+        } else {
+            Log.d("Hello", "There");
+            requestPermissions(  getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
+        }
+    }
     protected String[] getRequiredPermissions() {
         return REQUIRED_PERMISSIONS;
     }

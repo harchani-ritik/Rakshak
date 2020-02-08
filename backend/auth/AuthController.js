@@ -16,7 +16,8 @@ var bcrypt = require("bcryptjs");
 var config = require("../config"); // get config file
 
 router.post("/login", function(req, res) {
-  User.findOne({ phone: req.body.phone }, function(err, user) {
+  console.log("login:" + req.body);
+  User.findOne({ uid: req.body.uid }, function(err, user) {
     if (err) return res.status(500).send("Error on the server.");
     if (!user) return res.status(404).send({ auth: false, token: null });
 
@@ -43,11 +44,10 @@ router.get("/logout", function(req, res) {
 
 router.post("/register", function(req, res) {
   var hashedPassword = bcrypt.hashSync(req.body.password, 8);
-  console.log("here");
+  console.log(req.body);
   User.create(
     {
-      firstName: req.body.firstName,
-      phone: req.body.phone,
+      uid: req.body.uid,
       password: hashedPassword
     },
     function(err, user) {
@@ -70,9 +70,9 @@ router.post("/register", function(req, res) {
 router.get("/me", VerifyToken, function(req, res, next) {
   User.findById(req.userId, { password: 0 }, function(err, user) {
     if (err)
-      return res.status(500).send("There was a problem finding the user.");
-    if (!user) return res.status(404).send("No user found.");
-    res.status(200).send(user);
+      return res.status(500).send({"auth": false});em 
+    if (!user) return res.status(404).send({"auth": false});
+    res.status(200).send({"auth": true});
   });
 });
 
