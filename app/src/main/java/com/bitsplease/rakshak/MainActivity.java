@@ -2,7 +2,6 @@ package com.bitsplease.rakshak;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -14,7 +13,6 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 //import android.telecom.Call;
 import android.util.Log;
@@ -34,21 +32,16 @@ import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.json.JSONException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -59,12 +52,11 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
 
     String TAG = "MyLOGS";
+    String emergencyType = "general";
     private static final int RC_SIGN_IN = 1;
-    private static final String[] REQUIRED_PERMISSIONS =
-            new String[] {
-                    Manifest.permission.CALL_PHONE,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            };
+    private static final String[] REQUIRED_PERMISSIONS = new String[] {
+            Manifest.permission.CALL_PHONE, Manifest.permission.ACCESS_COARSE_LOCATION
+    };
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
     //Firebase
     private FirebaseAuth mFirebaseAuth;
@@ -75,10 +67,10 @@ public class MainActivity extends AppCompatActivity {
     String lat, lon;
     private static int REQUEST_PHONE_CALL=1;
     Button helpButton;
-    Button medicalButton;
+    Button generalButton,medicalButton,fireButton,disasterButton;
 
     @SuppressLint("MissingPermission")
-    void makeCall()
+    void makeCall(String type)
     {
         fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
             @Override
@@ -115,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
                 runOnUiThread(new Runnable(){
-
-
                     @Override
                     public void run() {
                         MainActivity.this.runOnUiThread(new Runnable() {
@@ -135,7 +125,21 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
-        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "100"));
+        String phoneNumber;
+        if(type.equalsIgnoreCase("general"))
+        {
+            phoneNumber=getString(R.string.general_call);
+        }
+        else if(type.equalsIgnoreCase("fire")){
+            phoneNumber=getString(R.string.fire_call);
+        }
+        else if (type.equalsIgnoreCase("medical")){
+            phoneNumber=getString(R.string.medical_call);
+        }
+        else {
+            phoneNumber=getString(R.string.disaster_call);
+        }
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
         startActivity(intent);
     }
     @Override
@@ -159,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        helpButton = findViewById(R.id.help_button);
+        helpButton = findViewById(R.id.BTNhelp);
         ((View) helpButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -168,19 +172,44 @@ public class MainActivity extends AppCompatActivity {
 
                             Log.d("Hello", "There");
                             requestPermissions(  getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
-
                     }
                 }
                 else {
-                    makeCall();
+                    makeCall(emergencyType);
                 }
             }
         });
+        generalButton= findViewById(R.id.BTNgeneral);
+        fireButton = findViewById(R.id.BTNfire);
         medicalButton= findViewById(R.id.BTNmedical);
+        disasterButton=findViewById(R.id.BTNdisaster);
+
+        generalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this,"General Emergency Enabled",Toast.LENGTH_SHORT).show();
+                emergencyType="general";
+            }
+        });
+        fireButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this,"Fire Emergency Enabled",Toast.LENGTH_SHORT).show();
+                emergencyType="fire";
+            }
+        });
         medicalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showNotification(MainActivity.this,"Medical Emergency","This is a test notification");
+                Toast.makeText(MainActivity.this,"Medical Emergency Enabled",Toast.LENGTH_SHORT).show();
+                emergencyType="medical";
+            }
+        });
+        disasterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this,"Disaster Alert Enabled",Toast.LENGTH_SHORT).show();
+                emergencyType="disaster";
             }
         });
 

@@ -31,7 +31,30 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             Log.w("Exception", e.toString());
         }
         Log.d(TAG, "onMessageReceived: Recieved"+remoteMessage.getData());
-        showNotification(FirebaseMessagingService.this,"Messages Received","This is a sample notification");
+
+        String emergencyType,title,message;
+        emergencyType=remoteMessage.getData().get("type");
+        assert emergencyType != null;
+        if (emergencyType.equalsIgnoreCase("general"))
+        {
+            title="General Emergency";
+            message=getString(R.string.general_message);
+        }
+        else if(emergencyType.equalsIgnoreCase("fire"))
+        {
+            title="Fire Alert";
+            message=getString(R.string.fire_message);
+        }
+        else if (emergencyType.equalsIgnoreCase("medical"))
+        {
+            title="Medical Help";
+            message=getString(R.string.medical_message);
+        }
+        else{
+            title="Disaster Alert";
+            message=getString(R.string.disaster_message);
+        }
+        showNotification(FirebaseMessagingService.this,title,message);
         super.onMessageReceived(remoteMessage);
     }
 

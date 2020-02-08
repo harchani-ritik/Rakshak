@@ -8,16 +8,15 @@
 
 
     <Button
-        android:id="@+id/help_button"
+        android:id="@+id/BTNhelp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="276dp"
         android:background="#ff0000"
         android:gravity="center"
-        android:text="POLICE"
+        android:text="HELP"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/BTNmedical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,24 +24,37 @@
         android:id="@+id/BTNmedical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="Medical"
-        app:layout_constraintBottom_toTopOf="@+id/BTNfire"
-        tools:layout_editor_absoluteX="169dp" />
+        app:layout_constraintStart_toStartOf="@+id/BTNgeneral"
+        app:layout_constraintTop_toBottomOf="@+id/BTNgeneral" />
 
     <Button
-        android:id="@+id/BTNhome"
+        android:id="@+id/BTNdisaster"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Home"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="145dp"
+        android:text="Natural Disaster"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="169dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/BTNfire"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:text="Fire"
-        app:layout_constraintBottom_toTopOf="@+id/BTNhome"
-        tools:layout_editor_absoluteX="169dp" />
+        app:layout_constraintBottom_toTopOf="@+id/BTNdisaster"
+        app:layout_constraintStart_toStartOf="@+id/BTNdisaster" />
+
+    <Button
+        android:id="@+id/BTNgeneral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="21dp"
+        android:text="General Emergency"
+        app:layout_constraintBaseline_toBaselineOf="@+id/BTNfire"
+        app:layout_constraintEnd_toStartOf="@+id/BTNfire" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
