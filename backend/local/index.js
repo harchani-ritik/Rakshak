@@ -18,6 +18,8 @@ app.engine("handlebars", handlebars.engine);
 app.set("view engine", "handlebars");
 
 // add body parser
+var cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 const bodyParser = require("body-parser");
 
@@ -30,7 +32,7 @@ const mongoose = require("mongoose");
 
 // mongoose.connect(
 //   "mongodb+srv://admin:admin_password@cluster0-vi5m5.mongodb.net/test?retryWrites=true&w=majority",
-//   { useMongoClient: true }
+//   () => {}
 // );
 
 //add port to listen-default 3000
@@ -45,15 +47,62 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+app.get("/home", (req, res) => {
+  var request = require("request");
+  var token = req.cookies.auth;
+  var alert = false;
+  if (req.query.alert) {
+    alert = true;
+  }
+  request.post(
+    "http://192.168.43.30:3001/auth/me",
+    {
+      json: { accessToken: token }
+    },
+    function(error, response, body) {
+      if (!error & (response.body.auth !== true)) {
+        res.redirect("login");
+      } else {
+        res.render("home", {
+          user: response.body.user,
+          alert: alert
+        });
+      }
+    }
+  );
+});
+
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+app.post("/logout", (req, res) => {
+  var request = require("request");
+  var token = req.cookies.auth;
+  var alert = false;
+  request.post(
+    "http://192.168.43.30:3001/auth/logout",
+    {
+      json: { accessToken: token }
+    },
+    function(error, response, body) {}
+  );
+  res.redirect("login");
+});
+
 app.post("/login", (req, res) => {
   var request = require("request");
   console.log(req.body);
   request.post(
-    "http://localhost:3001/form-page",
-    { json: { email: req.body.email, pass: req.body.pass } },
+    "http://192.168.43.30:3001/auth/login",
+    { json: { uid: req.body.id, password: req.body.password } },
     function(error, response, body) {
-      if (!error && response.statusCode == 200) {
-        console.log(body);
+      //  console.log(response);
+      if (!error && response.body.auth == true) {
+        res.cookie("auth", response.body.token);
+        res.redirect("home");
+      } else {
+        res.redirect("login");
       }
     }
   );
