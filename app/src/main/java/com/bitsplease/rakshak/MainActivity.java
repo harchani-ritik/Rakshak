@@ -3,9 +3,13 @@ package com.bitsplease.rakshak;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static int REQUEST_PHONE_CALL=1;
     Button helpButton;
-    Button medical;
+    Button medicalButton;
 
     @SuppressLint("MissingPermission")
     void makeCall()
@@ -78,10 +82,15 @@ public class MainActivity extends AppCompatActivity {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
                 }
                 else {
-
-
-//                    makeCall();
+                    makeCall();
                 }
+            }
+        });
+        medicalButton= findViewById(R.id.BTNmedical);
+        medicalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendNotification();
             }
         });
 
@@ -133,6 +142,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    void sendNotification(){
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.common_full_open_on_phone)
+                        .setContentTitle("Medical Emergency")
+                        .setContentText("This is a test notification");
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
     }
 
     void sendDataToFirebase(String uid,String token)
