@@ -60,9 +60,7 @@ app.get("/", function(req, res) {
 
 app.post("/requests", function(req, res){
   //checking for a valid request
-  console.log(req.body);
   if(!isValid(req.body)) res.status(404).send("invalid request");
-  console.log(req.body);
   //getting the uid
   let uid = req.body.uid;
   

@@ -12,15 +12,18 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+//import android.telecom.Call;
 import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
+//import com.google.android.gms.common.api.Response;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -34,6 +37,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,6 +67,49 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     void makeCall()
     {
+        String url = getResources().getString(R.string.server) + "requests";
+        RequestBody body = new FormBody.Builder()
+                .add("uid", "yup")
+                .add("loc", "vl")
+                .add("date", "v2")
+                .add("time", "true")
+                .add("type", "fire")
+                .build();
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
+        //Call call = client.newCall(request);
+
+        client.newCall(request).enqueue(new Callback(){
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+                runOnUiThread(new Runnable(){
+
+
+                    @Override
+                    public void run() {
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), response.body().toString(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                e.printStackTrace();
+            }
+        });
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "100"));
         startActivity(intent);
     }
