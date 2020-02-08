@@ -1,6 +1,7 @@
 var express = require("express");
 var admin = require('firebase-admin');
 var app = express();
+
 var bodyParser = require("body-parser");
 global.__root = __dirname + "/";
 var app = express()
@@ -18,7 +19,7 @@ admin.initializeApp({
 var db = admin.database();
 var ref = db.ref("users");
 
-const messsage = (registrationToken, location, date, type, time) => {
+const message = (registrationToken, location, date, type, time) => {
   var message = {
     data: {
       loc : location,
@@ -38,7 +39,6 @@ const messsage = (registrationToken, location, date, type, time) => {
     .catch((error) => {
       console.log('Error sending message:', error);
     });
-    res.status(200).send("Yes");
 };
 
 const isViable = (uid) => {
@@ -49,15 +49,20 @@ const isValid = (body) => {
   return true;
 };
 
-
 app.get("/", function(req, res) {
-  res.status(200).send("Yes");
+  ref.on("value", function(snapshot) {
+    console.log(snapshot.val());
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+  res.status(200).send("Something went wrong");
 });
 
 app.post("/requests", function(req, res){
   //checking for a valid request
+  console.log(req.body);
   if(!isValid(req.body)) res.status(404).send("invalid request");
-  
+  console.log(req.body);
   //getting the uid
   let uid = req.body.uid;
   
@@ -66,7 +71,9 @@ app.post("/requests", function(req, res){
     let tokens = snapshot.val();
     Object.keys(tokens).forEach(function(key) {
       //Decide whether the current key is viable for sending the message
-      if (key!==uid && isViable(key)) message(tokens[key], req.body.loc, req.body.date, req.body.type, req.body.time);
+      if (key!==uid && isViable(key)){
+        message(tokens[key], req.body.loc, req.body.date, req.body.type, req.body.time);
+      } 
     });
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);

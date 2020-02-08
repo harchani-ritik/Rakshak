@@ -79,6 +79,23 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
 
+
+//                    makeCall();
+                }
+            }
+        });
+
+
+        //Firebase
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // user is signed in
+                    mUsername = user.getDisplayName();
+                    mUid = user.getUid();
                     FirebaseInstanceId.getInstance().getInstanceId()
                             .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                                 @Override
@@ -99,22 +116,6 @@ public class MainActivity extends AppCompatActivity {
 //                                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                                 }
                             });
-//                    makeCall();
-                }
-            }
-        });
-
-
-        //Firebase
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // user is signed in
-                    mUsername = user.getDisplayName();
-                    mUid = user.getUid();
                     //sendDataToFirebase(mUid,mToken);
                 } else {
                     // user is signed out

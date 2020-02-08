@@ -18,6 +18,12 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        try {
+            Toast.makeText(FirebaseMessagingService.this, remoteMessage.getData().toString(), Toast.LENGTH_SHORT).show();
+        }
+        catch(Exception e){
+            Log.w("Exception", e.toString());
+        }
         Log.d(TAG, "onMessageReceived: Recieved"+remoteMessage.getData());
         super.onMessageReceived(remoteMessage);
     }

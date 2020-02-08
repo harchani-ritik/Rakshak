@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Rakshak</string>
+    <string name="server">http://192.168.43.30:3001/</string>
 </resources>
