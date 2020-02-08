@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.CALL_PHONE, Manifest.permission.ACCESS_COARSE_LOCATION
     };
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
+    private FusedLocationProviderClient fusedLocationClient;
     //Firebase
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private FusedLocationProviderClient fusedLocationClient;
     String mUsername;
     String mUid,mToken;
     String lat, lon;
@@ -71,8 +71,7 @@ public class MainActivity extends AppCompatActivity {
     Button generalButton,medicalButton,fireButton,disasterButton;
 
     @SuppressLint("MissingPermission")
-    void makeCall(String type)
-    {
+    void makeCall(String type) {
         fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
@@ -143,8 +142,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     @Override
-    public void onRequestPermissionsResult(
-            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
             for (int grantResult : grantResults) {
                 if (grantResult == PackageManager.PERMISSION_DENIED) {
@@ -167,6 +165,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+        }
+
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+        }
+
         helpButton = findViewById(R.id.BTNhelp);
         ((View) helpButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,6 +219,24 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this,"Disaster Alert Enabled",Toast.LENGTH_SHORT).show();
                 emergencyType="disaster";
+
+                fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        Log.d(TAG, "onSuccess: got location");
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            String mlat = location.getLatitude() + "";
+                            String mlong = location.getLongitude() + "";
+//                              BTNsend.setEnabled(true);
+//                                Toast.makeText(Emergency.this, "Selected is " + select, Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onSuccess: Location found");
+                            Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
+                        }
+                    }
+                });
+                
             }
         });
 
@@ -239,17 +264,11 @@ public class MainActivity extends AppCompatActivity {
                                     sendDataToFirebase(mUid,token);
                                     Log.d(TAG, "onComplete: "+token);
                                     Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
-//                                    // Log and toast
-//                                    String msg = getString(R.string.msg_token_fmt, token);
-//                                    Log.d(TAG, msg);
-//                                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                                 }
                             });
-                    //sendDataToFirebase(mUid,mToken);
                 } else {
                     // user is signed out
                     Log.d(TAG, "onAuthStateChanged: User is signed out.");
-                    //OnSignedOutInitialise();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
@@ -262,51 +281,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-    }
-
-    protected String[] getRequiredPermissions() {
-        return REQUIRED_PERMISSIONS;
-    }
-    public static boolean hasPermissions(Context context, String... permissions) {
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(context, permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    public void showNotification(Context context, String title, String body) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        int notificationId = 1;
-        String channelId = "channel-01";
-        String channelName = "Channel Name";
-        int importance = NotificationManager.IMPORTANCE_HIGH;
-        Intent intent = new Intent(context, MainActivity.class);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel mChannel = new NotificationChannel(
-                    channelId, channelName, importance);
-            notificationManager.createNotificationChannel(mChannel);
-        }
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(title)
-                .setContentText(body);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addNextIntent(intent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        );
-        mBuilder.setContentIntent(resultPendingIntent);
-
-        notificationManager.notify(notificationId, mBuilder.build());
     }
 
     void sendDataToFirebase(String uid,String token)
