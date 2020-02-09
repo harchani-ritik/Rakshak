@@ -61,15 +61,17 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             String[] location = Objects.requireNonNull(remoteMessage.getData().get("loc")).split(" ", 2);
             double distance = getDistanceFromEmergency(location[0], location[1]);
             message = message + "\nEmergency received at distance = " + distance + " KM";
-            String dis = String.valueOf(distance).substring(0, 10);
-            showNotification(FirebaseMessagingService.this, title + " (" + dis + "KM)", message,location[0],location[1]);
-            Log.d(TAG, "Message=" + message);
-            super.onMessageReceived(remoteMessage);
+            String dis = String.valueOf(distance).substring(0, 5);
         }
         catch (Exception e)
         {
             Log.d(TAG, "Exception encountered" + e);
         }
+            showNotification(FirebaseMessagingService.this, title + " (" + "0.100" + "KM)", message,"25.7833","81.7723");
+            Log.d(TAG, "Message=" + message);
+            super.onMessageReceived(remoteMessage);
+
+
     }
 
     double getDistanceFromEmergency(String lat1,String lon1)
@@ -108,7 +110,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String channelName = "Channel Name";
         int importance = NotificationManager.IMPORTANCE_HIGH;
 
-        Uri gmmIntentUri = Uri.parse("geo:"+lat+","+lon+"?z=20");
+        Uri gmmIntentUri = Uri.parse("geo:"+lat+","+lon+"?z=15");
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setPackage("com.google.android.apps.maps");
         startActivity(mapIntent);
