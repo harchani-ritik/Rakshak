@@ -1,6 +1,6 @@
 # Rakshak
 Project for SIH internals IIITA.
-##Instructions for running
+## Instructions for running
 
 * For running the main server, go to the backend folder and run the command node server.js. The server should be up and running. Make sure you are not behinnd a proxy.
 
