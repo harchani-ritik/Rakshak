@@ -92,42 +92,25 @@
                     <div class="card">
                         <div class="card-title">
                             <h2 class="float-left">Reported Emergencies</h2>
-                            <div class="badge background-primary float-right">36</div>
+                            <div class="badge background-primary float-right">{{emer.length}}</div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="card-block">
+                            {{#each emer}}
                             <div class="mt-1">
-                                <img src="http://via.placeholder.com/45x45" alt="profile photo"
-                                    class="circle float-left profile-photo" width="45" height="auto">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTguktAj1jurEq-NdG7Izd79vIdUU2hmn95xMk8NIUw5s774_Os"
+                                    alt="profile photo" class="circle float-left profile-photo" width="45"
+                                    height="auto">
                                 <div class="float-left ml-1">
-                                    <p class="m-0"><strong>Jane Donovan</strong> <span class="text-muted">uploaded a new
-                                            photo</span></p>
-                                    <p class="text-small text-muted">30 minutes ago</p>
+                                    <p class="m-0"><strong>{{this.name}} Reported {{this.type}} emergency</strong> <span
+                                            class="text-muted">{{this.msg}}</span></p>
+                                    <p class="text-small text-muted">{{this.date}}</p>
                                 </div>
                                 <div class="clearfix"></div>
                                 <hr class="m-0 mb-2" />
                             </div>
-                            <div class="mt-1">
-                                <img src="http://via.placeholder.com/45x45" alt="profile photo"
-                                    class="circle float-left profile-photo" width="45" height="auto">
-                                <div class="float-left ml-1">
-                                    <p class="m-0"><strong>Sam Davidson</strong> <span class="text-muted">just replied
-                                            to your message</span></p>
-                                    <p class="text-small text-muted">12 hours ago</p>
-                                </div>
-                                <div class="clearfix"></div>
-                                <hr class="m-0 mb-2" />
-                            </div>
-                            <div class="mt-1">
-                                <img src="http://via.placeholder.com/45x45" alt="profile photo"
-                                    class="circle float-left profile-photo" width="45" height="auto">
-                                <div class="float-left ml-1">
-                                    <p class="m-0"><strong>Kelly Johnson</strong> <span class="text-muted">changed her
-                                            status</span></p>
-                                    <p class="text-small text-muted">2 days ago</p>
-                                </div>
-                                <div class="clearfix"></div>
-                            </div>
+                            {{/each}}
+
                         </div>
                     </div>
                 </div>
@@ -141,11 +124,11 @@
                             <h3>Your Server URL: {{user.networkId}} </h3>
                         </div>
                         <div class="card-block">
-                            <form method="POST" action="http://192.168.43.30:3001/setUrl">
+                            <form method="POST" action="http://192.168.43.30:3001/auth/setUrl">
                                 <fieldset>
                                     <label for="nameField">URL</label>
                                     <input type="text" placeholder="new URL" id="url">
-                                    <input type="hidden" value="{{user.uid}}" name="uid">
+                                    <input type="hidden" value="{{user._id}}" name="uid">
                                     <input class="button-primary" type="submit" value="change">
                                 </fieldset>
                             </form>

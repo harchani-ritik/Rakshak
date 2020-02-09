@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     String TAG = "MyLOGS";
     String emergencyType = "general";
+
     private static final int RC_SIGN_IN = 1;
 
     public static String organisation;

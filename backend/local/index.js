@@ -63,10 +63,23 @@ app.get("/home", (req, res) => {
       if (!error & (response.body.auth !== true)) {
         res.redirect("login");
       } else {
-        res.render("home", {
-          user: response.body.user,
-          alert: alert
-        });
+        user = response.body.user;
+        console.log(user);
+        let url = "http://192.168.43.30:3001/auth/" + user.uid + "/requests";
+        console.log(url);
+        request.post(
+          url,
+          {
+            json: { accessToken: token }
+          },
+          function(error, response, body) {
+            res.render("home", {
+              user: user,
+              alert: alert,
+              emer: response.body
+            });
+          }
+        );
       }
     }
   );
@@ -76,17 +89,25 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-app.post("/logout", (req, res) => {
+app.post("/register", (req, res) => {
   var request = require("request");
-  var token = req.cookies.auth;
-  var alert = false;
+  console.log(req.body);
   request.post(
-    "http://192.168.43.30:3001/auth/logout",
-    {
-      json: { accessToken: token }
-    },
-    function(error, response, body) {}
+    "http://192.168.43.30:3001/auth/register",
+    { json: { uid: req.body.id, password: req.body.password } },
+    function(error, response, body) {
+      if (!error && response.body.auth == true) {
+        res.cookie("auth", response.body.token);
+        res.redirect("home");
+      } else {
+        res.redirect("login");
+      }
+    }
   );
+});
+
+app.get("/logout", (req, res) => {
+  res.clearCookie("auth");
   res.redirect("login");
 });
 
