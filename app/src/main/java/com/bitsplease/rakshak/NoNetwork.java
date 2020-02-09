@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -11,6 +12,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+
+import android.content.Intent;
+import android.os.Bundle;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -107,5 +112,10 @@ public class NoNetwork extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    public void handleWalkieTalkie(View view){
+        Intent intent= new Intent(NoNetwork.this,com.bitsplease.rakshak.WalkiTalkie.class);
+        startActivity(intent);
     }
 }

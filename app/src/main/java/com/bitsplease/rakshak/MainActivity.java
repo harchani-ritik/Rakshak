@@ -1,31 +1,26 @@
 package com.bitsplease.rakshak;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-//import android.telecom.Call;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.firebase.ui.auth.AuthUI;
-//import com.google.android.gms.common.api.Response;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,12 +32,8 @@ import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.net.Uri;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import java.io.IOException;
+import java.util.Arrays;
 
 import io.chirp.chirpsdk.ChirpSDK;
 import io.chirp.chirpsdk.models.ChirpError;
@@ -53,13 +44,14 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import java.io.IOException;
-import java.util.Arrays;
 
 import static com.bitsplease.rakshak.CustomDialogClass.CHIRP_APP_CONFIG;
 import static com.bitsplease.rakshak.CustomDialogClass.CHIRP_APP_KEY;
 import static com.bitsplease.rakshak.CustomDialogClass.CHIRP_APP_SECRET;
 import static com.bitsplease.rakshak.NoNetwork.chirp;
+
+//import android.telecom.Call;
+//import com.google.android.gms.common.api.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -162,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
 
         //Firebase
         mFirebaseAuth = FirebaseAuth.getInstance();

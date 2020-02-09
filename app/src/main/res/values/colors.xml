@@ -3,4 +3,7 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#ffffff</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="state_unknown">#78909C</color>
+    <color name="state_connected">#0097A7</color>
+    <color name="state_searching">#B0BEC5</color>
 </resources>
