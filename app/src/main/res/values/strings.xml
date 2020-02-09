@@ -3,12 +3,18 @@
     <string name="server">http://192.168.43.30:3001/</string>
 
     <string name="error_missing_permissions">Cannot start without required permissions</string>
+    <string name="toast_connected">Connected to %s</string>
+    <string name="toast_disconnected">Disconnected from %s</string>
 
     <string name="general_call">100</string>
     <string name="fire_call">101</string>
     <string name="medical_call">102</string>
     <string name="disaster_call">108</string>
-
+    <string name="status_unknown">Please wait</string>
+    <string name="status_connected">Connected\nHold any of the volume keys to talk</string>
+    <string name="status_searching">Looking for a device to connect to</string>
+    <string name="dlat">805</string>
+    <string name="dlong">274</string>
     <string name="general_message">General Emergency is requested in your Area</string>
     <string name="fire_message">Fire is reported in your Area</string>
     <string name="medical_message">Medical Help is requested in your Area</string>

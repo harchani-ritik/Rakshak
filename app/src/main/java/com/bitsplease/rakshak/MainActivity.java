@@ -183,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         else if(!isNetworkAvailable()){
-            
+            Intent intent= new Intent(MainActivity.this,com.bitsplease.rakshak.NoNetwork.class);
+            startActivity(intent);
         }
 
 //        ((View) helpButton).setOnClickListener(new View.OnClickListener() {
