@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "firebase-admin": "^8.9.2",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.8.11"
+    "mongoose": "^5.8.11",
+    "request": "^2.88.0"
   }
 }

@@ -2,9 +2,10 @@ var express = require("express");
 var admin = require('firebase-admin');
 var app = express();
 let report = require("./Report");
-let predictServer = "192.168.13.212:3005/"
+let predictServer = "http://192.168.43.212:3005/"
 var bodyParser = require("body-parser");
 global.__root = __dirname + "/";
+const request = require("request");
 var app = express()
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -53,6 +54,10 @@ const isViable = (uid) => {
   return true;
 };
 
+const decode = (key) => {
+  return key;
+}
+
 const isValid = (body) => {
   return true;
 };
@@ -73,6 +78,14 @@ app.get("/", function(req, res) {
 });
 
 
+// Using a network
+app.post("/usenetwork",(req, res) => {
+  console.log(req.body);
+  let networkId = decode(req.body.key);
+  res.send("hi");
+});
+
+//Network Server Raisng an error
 app.post("/raiseAlert", function (req, res){
   console.log(req.body);
   let userstoSend = [];
@@ -107,6 +120,7 @@ app.post("/raiseAlert", function (req, res){
 
 
 app.post("/requests", function(req, res){
+  console.log(req.body);
   //checking for a valid request
   if(!isValid(req.body)) res.status(404).send("invalid request");
   //getting the uid
@@ -158,13 +172,23 @@ app.post("/requests", function(req, res){
 
 
 app.post("/predict", function(req, res){
+  console.log(req.body);
   let url = predictServer + 
           "predict?military_time=" + req.body.military_time + 
           "&lat=" + req.body.lat +
           "&long=" + req.body.long +
           "&age=" + req.body.age + 
-          "&gender=" + req.body.gender;  
-  res.send(url);
+          "&gender=" + req.body.gender; 
+          console.log(url); 
+          request.get(
+            url,
+            function(error, response, body) {
+              if (!error && response.statusCode == 200) {
+                console.log(body);
+              }
+              res.send(response);
+            }
+          );
 });
 
 
