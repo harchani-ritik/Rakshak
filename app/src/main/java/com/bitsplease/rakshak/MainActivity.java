@@ -44,6 +44,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import io.chirp.chirpsdk.ChirpSDK;
+import io.chirp.chirpsdk.models.ChirpError;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -54,11 +56,18 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static com.bitsplease.rakshak.CustomDialogClass.CHIRP_APP_CONFIG;
+import static com.bitsplease.rakshak.CustomDialogClass.CHIRP_APP_KEY;
+import static com.bitsplease.rakshak.CustomDialogClass.CHIRP_APP_SECRET;
+import static com.bitsplease.rakshak.NoNetwork.chirp;
+
 public class MainActivity extends AppCompatActivity {
 
     String TAG = "MyLOGS";
     String emergencyType = "general";
     private static final int RC_SIGN_IN = 1;
+
+    public static String organisation;
 
     static String mLat,mLon;
 
@@ -153,146 +162,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-//            @Override
-//            public void onSuccess(Location location) {
-//                Log.d(TAG, "onSuccess: got location");
-//                // Got last known location. In some rare situations this can be null.
-//                if (location != null) {
-//                    // Logic to handle location object
-//                    String mlat = location.getLatitude() + "";
-//                    String mlong = location.getLongitude() + "";
-////                              BTNsend.setEnabled(true);
-////                                Toast.makeText(Emergency.this, "Selected is " + select, Toast.LENGTH_SHORT).show();
-//                    Log.d(TAG, "onSuccess: Location found");
-//                    Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
-//                    mLat=mlat;mLon=mlong;
-//                }
-//            }
-//        });
-//
-//        helpButton = findViewById(R.id.BTNhelp);
-
-        //now checking network connectivity.
-        if(isNetworkAvailable()){
-            Log.d(TAG, "onActivityResult: NETOWRK AVAILABLE");
-            Intent intent= new Intent(MainActivity.this,com.bitsplease.rakshak.InNetwork.class);
-            startActivity(intent);
-        }
 
 
-        else if(!isNetworkAvailable()){
-            
-        }
-
-//        ((View) helpButton).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//
-//                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                    Toast.makeText(MainActivity.this, "Grant Permission to make calls", Toast.LENGTH_SHORT).show();
-//                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PHONE_CALL);
-//                } else {
-//                    makeCall(emergencyType);
-//                }
-//            }
-//        });
-//        generalButton= findViewById(R.id.BTNgeneral);
-//        fireButton = findViewById(R.id.BTNfire);
-//        medicalButton= findViewById(R.id.BTNmedical);
-//        disasterButton=findViewById(R.id.BTNdisaster);
-//
-//        generalButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"General Emergency Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="general";
-//            }
-//        });
-//        fireButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"Fire Emergency Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="fire";
-//            }
-//        });
-//        medicalButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"Medical Emergency Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="medical";
-//            }
-//        });
-//        disasterButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"Disaster Alert Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="disaster";
-
-
-//        ((View) helpButton).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-//                    Toast.makeText(MainActivity.this,"Grant Permission to make calls",Toast.LENGTH_SHORT).show();
-//                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
-//                }
-//                else {
-//                    makeCall(emergencyType);
-//                }
-//            }
-//        });
-//        generalButton= findViewById(R.id.BTNgeneral);
-//        fireButton = findViewById(R.id.BTNfire);
-//        medicalButton= findViewById(R.id.BTNmedical);
-//        disasterButton=findViewById(R.id.BTNdisaster);
-//
-//        generalButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"General Emergency Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="general";
-//            }
-//        });
-//        fireButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"Fire Emergency Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="fire";
-//            }
-//        });
-//        medicalButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"Medical Emergency Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="medical";
-//            }
-//        });
-//        disasterButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainActivity.this,"Disaster Alert Enabled",Toast.LENGTH_SHORT).show();
-//                emergencyType="disaster";
-//
-//                fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-//                    @Override
-//                    public void onSuccess(Location location) {
-//                        Log.d(TAG, "onSuccess: got location");
-//                        // Got last known location. In some rare situations this can be null.
-//                        if (location != null) {
-//                            // Logic to handle location object
-//                            String mlat = location.getLatitude() + "";
-//                            String mlong = location.getLongitude() + "";
-//                            Log.d(TAG, "onSuccess: Location found");
-//                            Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
-//                        }
-//                    }
-//                });
-//            }
-//        });
 
         //Firebase
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -320,6 +191,30 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
                                 }
                             });
+
+                    chirp = new ChirpSDK(getApplicationContext(), CHIRP_APP_KEY, CHIRP_APP_SECRET);
+                    ChirpError error = chirp.setConfig(CHIRP_APP_CONFIG);
+                    if (error.getCode() == 0) {
+                        Log.v("ChirpSDK: ", "Configured ChirpSDK");
+                    } else {
+                        Log.e("ChirpError: ", error.getMessage());
+                    }
+
+                    startService(new Intent(getApplicationContext(), Listener.class));
+
+                    //now checking network connectivity.
+                    if(isNetworkAvailable()){
+                        Log.d(TAG, "onActivityResult: NETOWRK AVAILABLE");
+                        Intent intent= new Intent(MainActivity.this,com.bitsplease.rakshak.InNetwork.class);
+                        startActivity(intent);
+                    }
+
+                    else if(!isNetworkAvailable()){
+                        Log.d(TAG, "onActivityResult: NETOWRK AVAILABLE");
+                        Intent intent= new Intent(MainActivity.this,com.bitsplease.rakshak.NoNetwork.class);
+                        startActivity(intent);
+                    }
+
                 } else {
                     // user is signed out
                     Log.d(TAG, "onAuthStateChanged: User is signed out.");
@@ -337,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
     }
-
 
     void sendDataToFirebase(String uid,String token) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -366,6 +260,31 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Hello", "There");
                     requestPermissions(getRequiredPermissions(), REQUEST_CODE_REQUIRED_PERMISSIONS);
                 }
+
+                chirp = new ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET);
+                ChirpError error = chirp.setConfig(CHIRP_APP_CONFIG);
+                if (error.getCode() == 0) {
+                    Log.v("ChirpSDK: ", "Configured ChirpSDK");
+                } else {
+                    Log.e("ChirpError: ", error.getMessage());
+                }
+
+                startService(new Intent(getApplicationContext(), Listener.class));
+
+                //now checking network connectivity.
+                if(isNetworkAvailable()){
+                    Log.d(TAG, "onActivityResult: NETOWRK AVAILABLE");
+                    Intent intent= new Intent(MainActivity.this,com.bitsplease.rakshak.InNetwork.class);
+                    startActivity(intent);
+                }
+
+                else if(!isNetworkAvailable()){
+                    Log.d(TAG, "onActivityResult: NETOWRK AVAILABLE");
+                    Intent intent= new Intent(MainActivity.this,com.bitsplease.rakshak.NoNetwork.class);
+                    startActivity(intent);
+                }
+
+
             }
 
             else if(resultCode==RESULT_CANCELED){

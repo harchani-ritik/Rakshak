@@ -27,6 +27,12 @@ dependencies {
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
+repositories {
+    maven {
+        url "https://maven.chirp.io/release"
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -41,6 +47,10 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:6.0.2'
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
     implementation 'com.google.firebase:firebase-database:19.2.1'
+
+    //chirp
+    //chirp
+    implementation "io.chirp:chirpsdk:3.10.+"
 }
 
 dependencies {

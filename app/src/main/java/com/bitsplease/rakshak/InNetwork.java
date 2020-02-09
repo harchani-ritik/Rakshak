@@ -4,16 +4,20 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,12 +37,13 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.bitsplease.rakshak.MainActivity.mUid;
+import static com.bitsplease.rakshak.MainActivity.organisation;
 
 public class InNetwork extends AppCompatActivity {
 
     Spinner spinner;
     String TAG = "MyLOGS";
-    Button BTNaskhelp;
+    Button BTNaskhelp,BTNInNetCommunity;
     String Emergency="General Emergency";
     static String mLat,mLon;
     String lat, lon;
@@ -71,7 +76,34 @@ public class InNetwork extends AppCompatActivity {
 
         spinner = findViewById(R.id.spinner);
         BTNaskhelp=findViewById(R.id.BTNaskhelp);
-        String[] spinnerEmergencylist = {"General Emergency", "Medical", "Fire"};
+        BTNInNetCommunity=findViewById(R.id.BTNInNetCommunity);
+
+        BTNInNetCommunity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(InNetwork.this);
+                builder.setTitle("Enter your organisation network ID");
+
+                final EditText input = new EditText(InNetwork.this);
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        organisation = input.getText().toString();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
+
+        String[] spinnerEmergencylist = {"General Emergency", "Medical", "Fire","Disaster"};
         ArrayAdapter<String> spinnerEmergencyAdapter = new ArrayAdapter<>(InNetwork.this, android.R.layout.simple_list_item_1, spinnerEmergencylist);
         spinnerEmergencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerEmergencyAdapter);
