@@ -81,10 +81,11 @@ public class InNetwork extends AppCompatActivity {
         BTNInNetPredictor.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                    try {
                         final String currentTime = Calendar.getInstance().getTime().toString().split(" ")[3];
 
                         RequestBody body = new FormBody.Builder()
-                                .add("military_time",  currentTime.substring(0, currentTime.lastIndexOf(':')))
+                                .add("military_time", currentTime.substring(0, currentTime.lastIndexOf(':')))
                                 .add("lat", mLat)
                                 .add("long", mLon)
                                 .add("age", "25")
@@ -92,18 +93,17 @@ public class InNetwork extends AppCompatActivity {
                                 .build();
 
 
-
                         Request request = new Request.Builder()
                                 .url(getResources().getString(R.string.server) + "predict")
                                 .post(body)
                                 .build();
-                        Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
 
-                        client.newCall(request).enqueue(new Callback(){
+                        client.newCall(request).enqueue(new Callback() {
 
                             @Override
                             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
-                                runOnUiThread(new Runnable(){
+                                runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         InNetwork.this.runOnUiThread(new Runnable() {
@@ -125,6 +125,14 @@ public class InNetwork extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         });
+                    }
+                    catch (Exception e)
+                    {
+                        Log.d(TAG,"Location is Null "+e);
+                    }
+
+                        Intent intent = new Intent(InNetwork.this,SearchSafety.class);
+                        startActivity(intent);
             }
         });
         BTNInNetCommunity.setOnClickListener(new View.OnClickListener() {
@@ -247,7 +255,7 @@ public class InNetwork extends AppCompatActivity {
                 .url(url)
                 .post(body)
                 .build();
-        Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
 
         client.newCall(request).enqueue(new Callback(){
 
