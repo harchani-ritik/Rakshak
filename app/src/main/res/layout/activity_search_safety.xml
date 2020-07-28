@@ -10,13 +10,15 @@
     <Button
         android:id="@+id/BTNrotate"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="31dp"
-        android:layout_marginBottom="51dp"
-        android:background="@drawable/askhelpbtn"
+        android:layout_width="306dp"
+        android:layout_height="306dp"
+        android:background="@drawable/radar_round"
         app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintStart_toStartOf="@+id/textView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.758" />
 
     <Button
         android:id="@+id/button"
@@ -35,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="76%"
-        android:textSize="48dp"
+        android:textSize="24dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,8 +48,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="159dp"
-        android:text="Safety Result of your Area is  "
-        android:textSize="24dp"
+        android:text="Safety result of your location is  "
+        android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

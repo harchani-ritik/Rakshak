@@ -57,21 +57,23 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             title="Disaster Alert";
             message=getString(R.string.disaster_message);
         }
+        String dis = "-1";
+        double distance = -1.0;
+        String lat ="-1",lon = "-1";
         try {
             String[] location = Objects.requireNonNull(remoteMessage.getData().get("loc")).split(" ", 2);
-            double distance = getDistanceFromEmergency(location[0], location[1]);
+
+            if (location.length > 2)
+                distance = getDistanceFromEmergency(location[0], location[1]);
             message = message + "\nEmergency received at distance = " + distance + " KM";
-            String dis = String.valueOf(distance).substring(0, 5);
+            dis = String.valueOf(distance).substring(0, 5);
         }
-        catch (Exception e)
-        {
-            Log.d(TAG, "Exception encountered" + e);
+        catch (Exception e){
+            Log.w("Exception caught in calculating distance from emergency ", e.toString());
         }
-            showNotification(FirebaseMessagingService.this, title + " (" + "0.100" + "KM)", message,"25.7833","81.7723");
-            Log.d(TAG, "Message=" + message);
-            super.onMessageReceived(remoteMessage);
-
-
+        showNotification(FirebaseMessagingService.this, title + " (" +dis + " KM)", message,lat,lon);
+        Log.d(TAG, "Message=" + message);
+        super.onMessageReceived(remoteMessage);
     }
 
     double getDistanceFromEmergency(String lat1,String lon1)
