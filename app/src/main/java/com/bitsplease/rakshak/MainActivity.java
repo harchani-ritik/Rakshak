@@ -56,7 +56,7 @@ import static com.bitsplease.rakshak.NoNetwork.chirp;
 public class MainActivity extends AppCompatActivity {
 
     String TAG = "MyLOGS";
-    String emergencyType = "general";
+//    String emergencyType = "general";
 
     private static final int RC_SIGN_IN = 1;
 
@@ -69,88 +69,88 @@ public class MainActivity extends AppCompatActivity {
     };
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 1;
 
-    private FusedLocationProviderClient fusedLocationClient;
+//    private FusedLocationProviderClient fusedLocationClient;
     //Firebase
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     String mUsername;
     public static String mUid,mToken;
-    String lat, lon;
+//    String lat, lon;
     private static int REQUEST_PHONE_CALL=1;
-    Button helpButton;
-    Button generalButton,medicalButton,fireButton,disasterButton;
+//    Button helpButton;
+//    Button generalButton,medicalButton,fireButton,disasterButton;
 
-    @SuppressLint("MissingPermission")
-    void makeCall(String type) {
-        fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                Log.d(TAG, "onSuccess: got location");
-
-                if (location != null) {
-                    // Logic to handle location
-                    lat = location.getLatitude() + "";
-                    lon = location.getLongitude() + "";
-                    Log.d(TAG, "onSuccess: Location found");
-                    Log.d(TAG, "onSuccess: Lat is "+lat+"Long is "+lon);
-                }
-            }
-        });
-        String url = getResources().getString(R.string.server) + "requests";
-        RequestBody body = new FormBody.Builder()
-                .add("uid", mUid)
-                .add("loc", lat + " " + lon)
-                .add("type", type)
-                .add("msg","")
-                .build();
-
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
-
-        client.newCall(request).enqueue(new Callback(){
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
-                runOnUiThread(new Runnable(){
-                    @Override
-                    public void run() {
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), response.body().toString(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
-            }
-        });
-        String phoneNumber;
-        if(type.equalsIgnoreCase("general"))
-        {
-            phoneNumber=getString(R.string.general_call);
-        }
-        else if(type.equalsIgnoreCase("fire")){
-            phoneNumber=getString(R.string.fire_call);
-        }
-        else if (type.equalsIgnoreCase("medical")){
-            phoneNumber=getString(R.string.medical_call);
-        }
-        else {
-            phoneNumber=getString(R.string.disaster_call);
-        }
-        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
-        startActivity(intent);
-    }
+//    @SuppressLint("MissingPermission")
+//    void makeCall(String type) {
+//        fusedLocationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+//            @Override
+//            public void onSuccess(Location location) {
+//                Log.d(TAG, "onSuccess: got location");
+//
+//                if (location != null) {
+//                    // Logic to handle location
+//                    lat = location.getLatitude() + "";
+//                    lon = location.getLongitude() + "";
+//                    Log.d(TAG, "onSuccess: Location found");
+//                    Log.d(TAG, "onSuccess: Lat is "+lat+"Long is "+lon);
+//                }
+//            }
+//        });
+//        String url = getResources().getString(R.string.server) + "requests";
+//        RequestBody body = new FormBody.Builder()
+//                .add("uid", mUid)
+//                .add("loc", lat + " " + lon)
+//                .add("type", type)
+//                .add("msg","")
+//                .build();
+//
+//        OkHttpClient client = new OkHttpClient();
+//
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .post(body)
+//                .build();
+//        Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
+//
+//        client.newCall(request).enqueue(new Callback(){
+//
+//            @Override
+//            public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+//                runOnUiThread(new Runnable(){
+//                    @Override
+//                    public void run() {
+//                        MainActivity.this.runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(getApplicationContext(), response.body().toString(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//        String phoneNumber;
+//        if(type.equalsIgnoreCase("general"))
+//        {
+//            phoneNumber=getString(R.string.general_call);
+//        }
+//        else if(type.equalsIgnoreCase("fire")){
+//            phoneNumber=getString(R.string.fire_call);
+//        }
+//        else if (type.equalsIgnoreCase("medical")){
+//            phoneNumber=getString(R.string.medical_call);
+//        }
+//        else {
+//            phoneNumber=getString(R.string.disaster_call);
+//        }
+//        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+//        startActivity(intent);
+//    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                                     mToken = token;
                                     sendDataToFirebase(mUid,token);
                                     Log.d(TAG, "onComplete: "+token);
-                                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
                                 }
                             });
 

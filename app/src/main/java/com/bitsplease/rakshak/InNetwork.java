@@ -1,11 +1,14 @@
 package com.bitsplease.rakshak;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,13 +45,15 @@ public class InNetwork extends AppCompatActivity {
     Spinner spinner;
     OkHttpClient client;
     String TAG = "MyLOGS";
-    Button BTNaskhelp,BTNInNetCommunity, BTNInNetPredictor;
-    String Emergency="General Emergency";
-    static String mLat,mLon;
+    Button BTNaskhelp, BTNInNetCommunity, BTNInNetPredictor;
+    String Emergency = "General Emergency";
+    static String mLat, mLon;
     String lat, lon;
     private FusedLocationProviderClient fusedLocationClient;
     String mToken;
-    protected void getloc(){
+    private static final int REQUEST_PHONE_CALL = 1;
+
+    protected void getloc() {
         super.onStart();
         fusedLocationClient.getLastLocation().addOnSuccessListener(InNetwork.this, new OnSuccessListener<Location>() {
             @Override
@@ -60,12 +65,14 @@ public class InNetwork extends AppCompatActivity {
                     String mlat = location.getLatitude() + "";
                     String mlong = location.getLongitude() + "";
                     Log.d(TAG, "onSuccess: Location found");
-                    Log.d(TAG, "onSuccess: Lat is "+mlat+"Long is "+mlong);
-                    mLat=mlat;mLon=mlong;
+                    Log.d(TAG, "onSuccess: Lat is " + mlat + "Long is " + mlong);
+                    mLat = mlat;
+                    mLon = mlong;
                 }
             }
         });
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,64 +82,62 @@ public class InNetwork extends AppCompatActivity {
 
         getloc();
         spinner = findViewById(R.id.spinner);
-        BTNaskhelp=findViewById(R.id.BTNaskhelp);
-        BTNInNetCommunity=findViewById(R.id.BTNInNetCommunity);
-        BTNInNetPredictor=findViewById(R.id.BTNInNetPredictor);
-        BTNInNetPredictor.setOnClickListener(new View.OnClickListener(){
+        BTNaskhelp = findViewById(R.id.BTNaskhelp);
+        BTNInNetCommunity = findViewById(R.id.BTNInNetCommunity);
+        BTNInNetPredictor = findViewById(R.id.BTNInNetPredictor);
+        BTNInNetPredictor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    try {
-                        final String currentTime = Calendar.getInstance().getTime().toString().split(" ")[3];
+                try {
+                    final String currentTime = Calendar.getInstance().getTime().toString().split(" ")[3];
 
-                        RequestBody body = new FormBody.Builder()
-                                .add("military_time", currentTime.substring(0, currentTime.lastIndexOf(':')))
-                                .add("lat", mLat)
-                                .add("long", mLon)
-                                .add("age", "25")
-                                .add("gemder", "female")
-                                .build();
+                    RequestBody body = new FormBody.Builder()
+                            .add("military_time", currentTime.substring(0, currentTime.lastIndexOf(':')))
+                            .add("lat", mLat)
+                            .add("long", mLon)
+                            .add("age", "25")
+                            .add("gemder", "female")
+                            .build();
 
 
-                        Request request = new Request.Builder()
-                                .url(getResources().getString(R.string.server) + "predict")
-                                .post(body)
-                                .build();
-                        //Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
+                    Request request = new Request.Builder()
+                            .url(getResources().getString(R.string.server) + "predict")
+                            .post(body)
+                            .build();
+                    //Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
 
-                        client.newCall(request).enqueue(new Callback() {
+                    client.newCall(request).enqueue(new Callback() {
 
-                            @Override
-                            public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        InNetwork.this.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Toast.makeText(getApplicationContext(), response.body().string(), Toast.LENGTH_SHORT).show();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();
-                                                }
+                        @Override
+                        public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    InNetwork.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                Toast.makeText(getApplicationContext(), response.body().string(), Toast.LENGTH_SHORT).show();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
                                             }
-                                        });
-                                    }
-                                });
-                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
 
-                            @Override
-                            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    }
-                    catch (Exception e)
-                    {
-                        Log.d(TAG,"Location is Null "+e);
-                    }
+                        @Override
+                        public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.d(TAG, "Location is Null " + e);
+                }
 
-                        Intent intent = new Intent(InNetwork.this,SearchSafety.class);
-                        startActivity(intent);
+                Intent intent = new Intent(InNetwork.this, SearchSafety.class);
+                startActivity(intent);
             }
         });
         BTNInNetCommunity.setOnClickListener(new View.OnClickListener() {
@@ -153,24 +158,23 @@ public class InNetwork extends AppCompatActivity {
                                 .build();
 
 
-
                         Request request = new Request.Builder()
                                 .url(getResources().getString(R.string.server) + "usenetwork")
                                 .post(body)
                                 .build();
                         Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
 
-                        client.newCall(request).enqueue(new Callback(){
+                        client.newCall(request).enqueue(new Callback() {
 
                             @Override
                             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
-                                runOnUiThread(new Runnable(){
+                                runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         InNetwork.this.runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
+                                            @Override
+                                            public void run() {
+                                                try {
                                                     Toast.makeText(getApplicationContext(), response.body().string(), Toast.LENGTH_SHORT).show();
                                                 } catch (IOException e) {
                                                     e.printStackTrace();
@@ -199,21 +203,20 @@ public class InNetwork extends AppCompatActivity {
             }
         });
 
-        String[] spinnerEmergencylist = {"General Emergency", "Medical", "Fire","Disaster"};
+        String[] spinnerEmergencylist = {"General Emergency", "Medical", "Fire", "Disaster"};
         ArrayAdapter<String> spinnerEmergencyAdapter = new ArrayAdapter<>(InNetwork.this, android.R.layout.simple_list_item_1, spinnerEmergencylist);
         spinnerEmergencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerEmergencyAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (parent.getItemAtPosition(position).toString().equals("General Emergency")){
-                    Emergency="General Emergency";
+                if (parent.getItemAtPosition(position).toString().equals("General Emergency")) {
+                    Emergency = "General Emergency";
 //                    Toast.makeText(InNetwork.this, "General Emergency selected", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     Log.d(TAG, "onItemSelected: in else");
-                    Toast.makeText(InNetwork.this, parent.getItemAtPosition(position).toString()+" selected.", Toast.LENGTH_SHORT).show();
-                    Emergency=parent.getItemAtPosition(position).toString();
+                    Toast.makeText(InNetwork.this, parent.getItemAtPosition(position).toString() + " selected.", Toast.LENGTH_SHORT).show();
+                    Emergency = parent.getItemAtPosition(position).toString();
                 }
             }
 
@@ -238,7 +241,6 @@ public class InNetwork extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    @SuppressLint("MissingPermission")
     void makeCall(String type) {
 
         String url = getResources().getString(R.string.server) + "requests";
@@ -246,9 +248,8 @@ public class InNetwork extends AppCompatActivity {
                 .add("uid", mUid)
                 .add("loc", mLat + " " + mLon)
                 .add("type", type)
-                .add("msg","")
+                .add("msg", "")
                 .build();
-
 
 
         Request request = new Request.Builder()
@@ -257,11 +258,11 @@ public class InNetwork extends AppCompatActivity {
                 .build();
         //Toast.makeText(getApplicationContext(), "Trying to Login", Toast.LENGTH_LONG).show();
 
-        client.newCall(request).enqueue(new Callback(){
+        client.newCall(request).enqueue(new Callback() {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
-                runOnUiThread(new Runnable(){
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         InNetwork.this.runOnUiThread(new Runnable() {
@@ -284,20 +285,27 @@ public class InNetwork extends AppCompatActivity {
             }
         });
         String phoneNumber;
-        if(type.equalsIgnoreCase("General Emergency"))
-        {
-            phoneNumber=getString(R.string.general_call);
-        }
-        else if(type.equalsIgnoreCase("Fire")){
-            phoneNumber=getString(R.string.fire_call);
-        }
-        else if (type.equalsIgnoreCase("Medical")){
-            phoneNumber=getString(R.string.medical_call);
-        }
-        else {
-            phoneNumber=getString(R.string.disaster_call);
+        if (type.equalsIgnoreCase("General Emergency")) {
+            phoneNumber = getString(R.string.general_call);
+        } else if (type.equalsIgnoreCase("Fire")) {
+            phoneNumber = getString(R.string.fire_call);
+        } else if (type.equalsIgnoreCase("Medical")) {
+            phoneNumber = getString(R.string.medical_call);
+        } else {
+            phoneNumber = getString(R.string.disaster_call);
         }
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(InNetwork.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+            return;
+        }
         startActivity(intent);
     }
 
