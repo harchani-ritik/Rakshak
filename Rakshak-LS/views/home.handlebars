@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from medialoot.com/preview/html5-admin/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 08 Feb 2020 09:20:53 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+
+<head>
+    <meta charset="utf-8">
+    <title>Rakshak Home </title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700"
+        rel="stylesheet">
+
+    <!-- Template Styles -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="css/normalize.css">
+
+    <!-- Milligram CSS minified -->
+    <link rel="stylesheet" href="dist/milligram.min.css">
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="row">
+            <div class="column column-30 col-site-title"><a href="#" class="site-title float-left"><img
+                        src="images/image.png" width="150px"><img></a></div>
+
+            <div class="column column-30">
+
+                <div class="username" style="float:right; margin-right:100px;">
+                    <h4>Your Network Id: {{ user.uid }}</h4>
+                </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="row">
+        <div id="sidebar" class="column">
+            <h5>Navigation</h5>
+            <ul>
+                <li><a href="#"><em class="fa fa-tachometer"></em> Dashboard</a></li>
+                <li><a href="/logout"><em class="fa fa-bar-chart"></em> Log Out</a></li>
+
+            </ul>
+        </div>
+        <section id="main-content" class="column column-offset-20">
+            {{#if alert }}
+            <div class="row grid-responsive">
+                <div class="column">
+
+                    <div class="alert background-danger"><em class="fa fa-bullhorn"></em> Emergency Declared!
+                    </div>
+
+                </div>
+            </div>
+            {{/if}}
+            <div class="row grid-responsive">
+                <div class="column page-heading">
+                    <div class="large-card">
+                        <h1>Declare Emergency</h1>
+                        Is there a emergency in your network? Type some information and raise alerts.
+
+
+                        <form action="http://192.168.43.30:3001/raiseAlert" method="POST">
+                            <input style="margin-top:20px;" type="text" name="info" placeholder="Short Info" />
+                            <input type="hidden" value="{{user.uid}}" name="uid">
+                            <button class="button" style="background-color:#FC4660; border-color:white;"
+                                type="submit">Emergency</button>
+                        </form>
+
+
+
+                    </div>
+                </div>
+            </div>
+            <!--Widgets-->
+
+            <div class="row grid-responsive mt-1">
+                <div class="column">
+                    <div class="card">
+                        <div class="card-title">
+                            <h2 class="float-left">Reported Emergencies</h2>
+                            <div class="badge background-primary float-right">{{emer.length}}</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="card-block">
+                            {{#each emer}}
+                            <div class="mt-1">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTguktAj1jurEq-NdG7Izd79vIdUU2hmn95xMk8NIUw5s774_Os"
+                                    alt="profile photo" class="circle float-left profile-photo" width="45"
+                                    height="auto">
+                                <div class="float-left ml-1">
+                                    <p class="m-0"><strong>{{this.name}} Reported {{this.type}} emergency</strong> <span
+                                            class="text-muted">{{this.msg}}</span></p>
+                                    <p class="text-small text-muted">{{this.date}}</p>
+                                </div>
+                                <div class="clearfix"></div>
+                                <hr class="m-0 mb-2" />
+                            </div>
+                            {{/each}}
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <h5 class="mt-2">configure</h5><a class="anchor" name="forms"></a>
+            <div class="row grid-responsive">
+                <div class="column ">
+                    <div class="card">
+                        <div class="card-title">
+                            <h3>Your Server URL: {{user.networkId}} </h3>
+                        </div>
+                        <div class="card-block">
+                            <form method="POST" action="http://192.168.43.30:3001/auth/setUrl">
+                                <fieldset>
+                                    <label for="nameField">URL</label>
+                                    <input type="text" placeholder="new URL" id="url">
+                                    <input type="hidden" value="{{user._id}}" name="uid">
+                                    <input class="button-primary" type="submit" value="change">
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+    </div>
+
+    <script src="js/chart.min.js"></script>
+    <script src="js/chart-data.js"></script>
+    <script>
+        window.onload = function () {
+            var chart1 = document.getElementById("line-chart").getContext("2d");
+            window.myLine = new Chart(chart1).Line(lineChartData, {
+                responsive: true,
+                scaleLineColor: "rgba(0,0,0,.2)",
+                scaleGridLineColor: "rgba(0,0,0,.05)",
+                scaleFontColor: "#c5c7cc"
+            });
+            var chart2 = document.getElementById("bar-chart").getContext("2d");
+            window.myBar = new Chart(chart2).Bar(barChartData, {
+                responsive: true,
+                scaleLineColor: "rgba(0,0,0,.2)",
+                scaleGridLineColor: "rgba(0,0,0,.05)",
+                scaleFontColor: "#c5c7cc"
+            });
+            var chart4 = document.getElementById("pie-chart").getContext("2d");
+            window.myPie = new Chart(chart4).Pie(pieData, {
+                responsive: true,
+                segmentShowStroke: false
+            });
+            var chart5 = document.getElementById("radar-chart").getContext("2d");
+            window.myRadarChart = new Chart(chart5).Radar(radarData, {
+                responsive: true,
+                scaleLineColor: "rgba(0,0,0,.05)",
+                angleLineColor: "rgba(0,0,0,.2)"
+            });
+            var chart6 = document.getElementById("polar-area-chart").getContext("2d");
+            window.myPolarAreaChart = new Chart(chart6).PolarArea(polarData, {
+                responsive: true,
+                scaleLineColor: "rgba(0,0,0,.2)",
+                segmentShowStroke: false
+            });
+        };
+    </script>
+
+</body>
+
+
+</html>
