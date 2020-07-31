@@ -1,28 +1,49 @@
-var express = require("express");
-var admin = require('firebase-admin');
-var app = express();
-let report = require("./Report");
-let predictServer = "http://192.168.43.212:3005/"
-var bodyParser = require("body-parser");
-global.__root = __dirname + "/";
+//Getting the essentials
+const express = require("express");
+const admin = require('firebase-admin');
+const report = require("./Report");
+const bodyParser = require("body-parser");
 const request = require("request");
-var app = express()
+const serviceAccount = require("./serviceaccount.json");
+var mongoose = require("mongoose");
 
+//Setting the strings
+const predictServer = "http://192.168.43.212:3005/"
+global.__root = __dirname + "/";
+
+//Initializing the App
+const app = express();
+
+//Adding middlewares
 app.use(bodyParser.urlencoded({ extended: false }))
-
 app.use(bodyParser.json())
-var serviceAccount = require("./serviceaccount.json");
 
+//Adding router for Users related requests
+const UserController = require(__root + "user/UserController");
+app.use("/users", UserController);
+
+//Adding router for Auth requests
+const AuthController = require(__root + "auth/AuthController");
+app.use("/auth", AuthController);
+
+//Initializing Firebase
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://rakshak-53755.firebaseio.com"
 });
 
-var dbm = require("./db");
-var db = admin.database();
-var ref = db.ref("users");
-var refn = db.ref("network");
+//Initializing mongoDB
+mongoose.connect("mongodb+srv://test:test@cluster0-vi5m5.mongodb.net/test?retryWrites=true&w=majority", {
+  useUnifiedTopology: true,
+  useNewUrlParser: true
+});
 
+//Setting Users and Network firebase references
+const db = admin.database();
+const firebaseUsers = db.ref("users");
+const firebaseNetworks = db.ref("network");
+
+//Function for sending notification to the selected user
 const message = (registrationToken, location, type, msg) => {
   var message = {
     data: {
@@ -32,11 +53,8 @@ const message = (registrationToken, location, type, msg) => {
     },
     token: registrationToken
   };
-  // Send a message to the device corresponding to the provided
-  // registration token.
   admin.messaging().send(message)
     .then((response) => {
-      // Response is a message ID string.
       console.log('Successfully sent message:' + registrationToken, response);
     })
     .catch((error) => {
@@ -44,32 +62,30 @@ const message = (registrationToken, location, type, msg) => {
     });
 };
 
-var UserController = require(__root + "user/UserController");
-app.use("/users", UserController);
-
-var AuthController = require(__root + "auth/AuthController");
-app.use("/auth", AuthController);
-
+//Dummy function for checking whether to send the notification to a user or nit
 const isViable = (uid) => {
   return true;
 };
 
+//?Dummy function that decodes the network id into firebase key
 const decode = (key) => {
   return key;
 }
 
+//Checks if the rquest is valid
 const isValid = (body) => {
   return true;
 };
 
+//Just a route to get the info of the firebase data
 app.get("/", function(req, res) {
 
-  ref.on("value", function(snapshot) {
+  firebaseUsers.on("value", function(snapshot) {
     console.log(snapshot.val());
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
-  refn.on("value", function(snapshot) {
+  firebaseNetworks.on("value", function(snapshot) {
     console.log(snapshot.val());
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
@@ -78,18 +94,18 @@ app.get("/", function(req, res) {
 });
 
 
-// Using a network
+// ?Register a user on a network
 app.post("/usenetwork",(req, res) => {
   console.log(req.body);
   let networkId = decode(req.body.key);
   res.send("hi");
 });
 
-//Network Server Raisng an error
+// ?Network Server Raisng an alert, sends everyone in the network a notification
 app.post("/raiseAlert", function (req, res){
   console.log(req.body);
   let userstoSend = [];
-  refn.on("value", function(snapshot) {
+  firebaseNetworks.on("value", function(snapshot) {
     let ids = snapshot.val();
     Object.keys(ids).forEach(function(key) {
       //Decide whether the current key is viable for sending the message
@@ -99,7 +115,7 @@ app.post("/raiseAlert", function (req, res){
        } 
     });
     console.log(userstoSend);
-    ref.on("value", function(snapshot) {
+    firebaseUsers.on("value", function(snapshot) {
       let tokens = snapshot.val();
       Object.keys(tokens).forEach(function(key) {
         //Decide whether the current key is viable for sending the message
@@ -118,7 +134,7 @@ app.post("/raiseAlert", function (req, res){
 });
 
 
-
+//Handling emergency requests from users
 app.post("/requests", function(req, res){
   console.log(req.body);
   //checking for a valid request
@@ -127,7 +143,7 @@ app.post("/requests", function(req, res){
   let uid = req.body.uid;
   
   //getting all the registrationTokens and sending the notification
-  ref.on("value", function(snapshot) {
+  firebaseUsers.on("value", function(snapshot) {
     let tokens = snapshot.val();
     Object.keys(tokens).forEach(function(key) {
       //Decide whether the current key is viable for sending the message
@@ -139,7 +155,8 @@ app.post("/requests", function(req, res){
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
-  refn.on("value", function(snapshot) {
+  //Creates the report on the network
+  firebaseNetworks.on("value", function(snapshot) {
     admin.auth().getUser(req.body.uid).then((userRecord)=>{
       report.create(
         {
@@ -166,8 +183,7 @@ app.post("/requests", function(req, res){
     }, function (errorObject) {
       console.log("The read failed: " + errorObject.code);
     });
-    });
-    
+  });
 });
 
 
